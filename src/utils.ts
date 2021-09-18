@@ -29,6 +29,32 @@ export type Money = Amount;
  */
 export type Timestamp = u64;
 
+export type CryptoHash = Array<u8>;
+export type Base58CryptoHash = CryptoHash;
+
+@nearBindgen
+export class Option<T> {
+  constructor(public value: T) { }
+
+  is_some(): bool {
+    return (!this.is_none());
+  }
+  is_none(): bool {
+    if (isNullable<T>() || isReference<T>()) {
+      return changetype<usize>(this.value) == 0;
+    } else {
+      return false
+    }
+  }
+  expect(message: string = "Missing expected value"): T {
+    assert(this.is_some(), message);
+    return this.value;
+  }
+  unwrap(): T {
+    return this.expect();
+  }
+}
+
 /**
  * == CONSTANTS ================================================================
  *
